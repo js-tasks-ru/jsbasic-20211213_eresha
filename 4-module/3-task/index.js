@@ -3,7 +3,7 @@ function highlight(table) {
   for (let tBodye of tBodyes) {
     for (let row of tBodye.rows) {
       if (+row.cells[1].textContent < 18) {
-        row.style = "text-decoration: line-through";
+        row.style.textDecoration = "line-through";
       }
       if (row.cells[2].textContent === `m`) {
         row.classList.add('male');
