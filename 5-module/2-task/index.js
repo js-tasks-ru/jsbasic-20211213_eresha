@@ -2,7 +2,7 @@ function toggleText() {
   const btn = document.querySelector('.toggle-text-button');
   const text = document.querySelector('#text');
 
-  btn.addEventListener('click', () => (!text.hidden) ? text.hidden = true : text.hidden = false
+  btn.addEventListener('click', () => text.hidden = !text.hidden
   );
 }
 
