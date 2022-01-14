@@ -10,7 +10,7 @@ export default class ProductCard {
   }
 
   render() {
-    return this.elem = createElement(this._createCardMarkup(this.product));
+    this.elem = createElement(this._createCardMarkup(this.product));
   }
 
   _createCardMarkup(product) {
