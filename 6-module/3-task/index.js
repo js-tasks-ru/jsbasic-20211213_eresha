@@ -46,22 +46,14 @@ export default class Carousel {
     const arrowRight = this.elem.querySelector(`.carousel__arrow_right`);
     const arrowLeft = this.elem.querySelector(`.carousel__arrow_left`);
     let carouselInner = this.elem.querySelector(`.carousel__inner`);
-
     const carouselAddButtons = this.elem.querySelectorAll(`.carousel__button`);
-    // let widthSlide = carouselInner.offsetWidth;
-
-    console.log(this.elem.offsetWidth)
-    console.log(arrowLeft.offsetParent)
-    console.log(arrowRight.offsetWidth)
-    //не понимаю, почему не работает offsetWidth???
-    // Почему offsetParent null?
-
-    let widthSlide = 988; // добавила, чтобы слайды сдвигались
 
     let index = 0;
     arrowLeft.style.display = 'none';
 
     const moveSlide = (n) => {
+
+      let widthSlide = carouselInner.offsetWidth;
       carouselInner.style.transform = `translateX(-${widthSlide * n}px)`;
       arrowLeft.style.display = arrowRight.style.display = '';
       if (n === 0) {
