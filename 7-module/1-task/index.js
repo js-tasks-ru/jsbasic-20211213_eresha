@@ -25,7 +25,7 @@ export default class RibbonMenu {
 
   _createLinksMarkup(categories) {
     return categories.map((category, i) => {
-      return `<a href="#" class="ribbon__item ${i === 0 ? `ribbon__item_active` : ``}" data-id="${category.id} ">${category.name}</a>`;
+      return `<a href="#" class="ribbon__item ${i === 0 ? `ribbon__item_active` : ``}" data-id="${category.id}">${category.name}</a>`;
     }).join(`\n`);
   }
 
