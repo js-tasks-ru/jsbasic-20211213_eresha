@@ -5,6 +5,7 @@ export default class CartIcon {
     this.render();
 
     this.addEventListeners();
+    console.log(this.elem.offsetHeight)
   }
 
   render() {
@@ -26,7 +27,7 @@ export default class CartIcon {
       this.elem.classList.add('shake');
       this.elem.addEventListener('transitionend', () => {
         this.elem.classList.remove('shake');
-      }, {once: true});
+      }, { once: true });
 
     } else {
       this.elem.classList.remove('cart-icon_visible');
@@ -38,7 +39,42 @@ export default class CartIcon {
     window.addEventListener('resize', () => this.updatePosition());
   }
 
+  _resetStyle() {
+    Object.assign(this.elem.style, {
+      position: '',
+      top: '',
+      left: '',
+      zIndex: ''
+    });
+  }
+
+  _addFixPositionStyles() {
+    Object.assign(this.elem.style, {
+      position: 'fixed',
+      top: '50px',
+      right: '10px',
+      zIndex: 1e3,
+      left: Math.min(
+        document.querySelector('.container').getBoundingClientRect().right + 20,
+        document.documentElement.clientWidth - this.elem.offsetWidth - 10
+      ) + 'px'
+    });
+  }
+
   updatePosition() {
-    // ваш код ...
+    let initialTopCoord = this.elem.getBoundingClientRect().top + window.pageYOffset;
+    let isMobile = document.documentElement.clientWidth <= 767;
+    let momentBeginningMove = window.pageYOffset > initialTopCoord;
+
+    if (this.elem.offsetHeight) {
+
+      if (momentBeginningMove && !isMobile) {
+        this._addFixPositionStyles();
+      }
+
+      if (isMobile) {
+        this._resetStyle();
+      }
+    }
   }
 }
