@@ -8,35 +8,93 @@ export default class Cart {
 
   constructor(cartIcon) {
     this.cartIcon = cartIcon;
-
     this.addEventListeners();
   }
 
   addProduct(product) {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    let cartItem = {
+      product,
+      count: 1,
+    };
+    if (product === null || product === undefined) {
+      return;
+    }
+    if (this.cartItems.length === 0) {
+      this.cartItems.push(cartItem);
+    } else {
+      let productToAdd = this.cartItems.find((item) => item.product.id === product.id);
+      if (productToAdd) {
+        cartItem = productToAdd;
+        cartItem.count += 1;
+      } else {
+        this.cartItems.push(cartItem);
+      }
+    }
+
+    this.onProductUpdate(cartItem);
+  }
+
+  onProductUpdate(cartItem) {
+    // ...ваш код
+    this.cartIcon.update(this);
+
+    if (document.body.classList.contains('is-modal-open')) {
+      let productId = cartItem.product.id;
+      let modalBody = this.bodyElem;
+
+      let productCount = modalBody.querySelector(`[data-product-id="${productId}"] .cart-counter__count`);
+
+      let productPrice = modalBody.querySelector(`[data-product-id="${productId}"] .cart-product__price`);
+
+      let infoPrice = modalBody.querySelector(`.cart-buttons__info-price`);
+
+      if (cartItem.count === 0) {
+        modalBody.querySelector(`[data-product-id=${cartItem.product.id}]`).remove();
+      }
+
+      productCount.innerHTML = cartItem.count;
+      productPrice.innerHTML = `€${(cartItem.product.price * cartItem.count).toFixed(2)}`;
+      infoPrice.innerHTML = `€${this.getTotalPrice().toFixed(2)}`;
+
+    }
   }
 
   updateProductCount(productId, amount) {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    this.cartItems.forEach((item, i) => {
+      if (item.product.id === productId) {
+        item.count += amount;
+        this.onProductUpdate(item);
+        if (item.count <= 0) {
+          item.count = 0;
+          this.cartItems.splice(i, 1);
+        }
+      }
+    });
+    if (this.isEmpty()) {
+      this.modal.close();
+    }
   }
 
   isEmpty() {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    return (this.cartItems.length === 0) ? true : false;
   }
 
   getTotalCount() {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    return this.cartItems.reduce((sum, item) => {
+      return sum + (item.count);
+    }, 0);
   }
 
   getTotalPrice() {
-    // СКОПИРУЙТЕ СЮДЯ СВОЙ КОД
+    return this.cartItems.reduce((sum, item) => {
+      return sum + (item.product.price * item.count);
+    }, 0);
   }
 
   renderProduct(product, count) {
     return createElement(`
-    <div class="cart-product" data-product-id="${
-      product.id
-    }">
+    <div class="cart-product" data-product-id="${product.id
+      }">
       <div class="cart-product__img">
         <img src="/assets/images/products/${product.image}" alt="product">
       </div>
@@ -48,11 +106,11 @@ export default class Cart {
               <img src="/assets/images/icons/square-minus-icon.svg" alt="minus">
             </button>
             <span class="cart-counter__count">${count}</span>
-            <button type="button" class="cart-counter__button cart-counter__button_plus">
+            <button type="button"  class="cart-counter__button  cart-counter__button_plus">
               <img src="/assets/images/icons/square-plus-icon.svg" alt="plus">
             </button>
           </div>
-          <div class="cart-product__price">€${product.price.toFixed(2)}</div>
+          <div class="cart-product__price">€${(product.price * count).toFixed(2)}</div>
         </div>
       </div>
     </div>`);
@@ -74,8 +132,8 @@ export default class Cart {
           <div class="cart-buttons__info">
             <span class="cart-buttons__info-text">total</span>
             <span class="cart-buttons__info-price">€${this.getTotalPrice().toFixed(
-              2
-            )}</span>
+      2
+    )}</span>
           </div>
           <button type="submit" class="cart-buttons__button btn-group__button button">order</button>
         </div>
@@ -84,21 +142,67 @@ export default class Cart {
   }
 
   renderModal() {
-    // ...ваш код
+    this.modal = new Modal();
+    this.modal.setTitle("Your order");
+    this.bodyElem = document.createElement('div');
+
+    this.cartItems.forEach((item) => {
+      this.bodyElem.append(this.renderProduct(item.product, item.count));
+    });
+    this.bodyElem.append(this.renderOrderForm());
+
+    this.modal.setBody(this.bodyElem);
+
+    const cartForm = this.modal.elem.querySelector('.cart-form');
+
+    this.bodyElem.addEventListener('click', this.onCounterButtonClick);
+    cartForm.addEventListener('submit', this.onSubmit);
+
+    this.modal.open();
   }
 
-  onProductUpdate(cartItem) {
-    // ...ваш код
+  onCounterButtonClick = (evt) => {
+    let target = evt.target;
+    let btn = target.closest('.cart-counter__button');
+    if (btn) {
+      evt.preventDefault();
 
-    this.cartIcon.update(this);
+      let cartId = target.closest('.cart-product').dataset.productId;
+
+      if (btn.classList.contains('cart-counter__button_plus')) {
+        this.updateProductCount(cartId, 1);
+      } else if (btn.classList.contains('cart-counter__button_minus')) {
+        this.updateProductCount(cartId, -1);
+      }
+    }
   }
 
-  onSubmit(event) {
+
+  onSubmit = (evt) => {
     // ...ваш код
-  };
+    evt.preventDefault();
+    let orderFormData = new FormData(evt.target);
+    evt.target.querySelector('.cart-buttons__button').classList.add("is-loading");
+    fetch('https://httpbin.org/post', {
+      method: 'POST',
+      body: orderFormData
+    })
+      .then(() => {
+        this.modal.setTitle("Success!");
+        this.cartItems.length = 0;
+        this.modal.setBody(this.submitSuccess());
+        this.cartIcon.update(this);
+      });
+  }
+
+  submitSuccess() {
+    return createElement(`<div class="modal__body-inner"><p>Order successful! Your order is being cooked :) <br>We’ll notify you about delivery time shortly.<br><img src="../../assets/images/delivery.gif"></p></div>`);
+  }
 
   addEventListeners() {
     this.cartIcon.elem.onclick = () => this.renderModal();
   }
+
+
 }
 
