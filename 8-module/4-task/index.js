@@ -72,11 +72,12 @@ export default class Cart {
     });
     if (this.isEmpty()) {
       this.modal.close();
+      this.cartIcon.update(this);
     }
   }
 
   isEmpty() {
-    return (this.cartItems.length === 0) ? true : false;
+    return (this.cartItems.length === 0);
   }
 
   getTotalCount() {

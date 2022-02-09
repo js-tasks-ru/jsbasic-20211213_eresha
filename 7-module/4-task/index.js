@@ -7,13 +7,13 @@ export default class StepSlider {
     this.value = value;
     this.render();
     this.elem.addEventListener('click', this._onCoordsClick);
-    this.thumb.addEventListener('pointerdown', this._onThumbPoinerdown);
+    this.thumb.addEventListener('pointerdown', this._onThumbPointerDown);
   }
 
   render() {
     this.elem = createElement(this._createSliderMarkup());
     this._createSliderStepsMarkup(this.steps);
-    this._changeSliderProgress(this.value);
+    this._changeSliderProgress((this.value / (this.steps - 1) * 100));
     this._getActiveSliderStep(this.value);
   }
 
@@ -22,7 +22,7 @@ export default class StepSlider {
 
       <!--Ползунок слайдера с активным значением-->
       <div class="slider__thumb">
-        <span class="slider__value">0</span>
+        <span class="slider__value">${this.value}</span>
       </div>
 
       <!--Полоска слайдера-->
@@ -85,10 +85,10 @@ export default class StepSlider {
     this.elem.dispatchEvent(customEvent);
   }
 
-  _onThumbPoinerdown = (evt) => {
+  _onThumbPointerDown = (evt) => {
     this.thumb.ondragstart = () => false;
 
-    const onThumbPoinermove = (moveEvt) => {
+    const onThumbPoinerMove = (moveEvt) => {
       this.elem.classList.add('slider_dragging');
 
       let pageX = moveEvt.pageX;
@@ -111,15 +111,15 @@ export default class StepSlider {
 
     };
 
-    const onThumbPoinerup = () => {
+    const onThumbPoinerUp = () => {
       this.elem.classList.remove('slider_dragging');
-      document.removeEventListener('pointermove', onThumbPoinermove);
-      document.removeEventListener('pointerup', onThumbPoinerup);
+      document.removeEventListener('pointermove', onThumbPoinerMove);
+      document.removeEventListener('pointerup', onThumbPoinerUp);
       this._initCustomEvent();
     };
 
-    document.addEventListener('pointermove', onThumbPoinermove);
-    document.addEventListener('pointerup', onThumbPoinerup);
+    document.addEventListener('pointermove', onThumbPoinerMove);
+    document.addEventListener('pointerup', onThumbPoinerUp);
   }
 
   _onCoordsClick = (evt) => {
