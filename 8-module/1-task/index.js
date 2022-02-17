@@ -5,7 +5,6 @@ export default class CartIcon {
     this.render();
 
     this.addEventListeners();
-    console.log(this.elem.offsetHeight)
   }
 
   render() {

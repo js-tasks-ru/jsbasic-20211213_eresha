@@ -79,7 +79,6 @@ export default class RibbonMenu {
 
   onClick = (evt) => {
     evt.preventDefault();
-    console.log(this.elem)
     this.items.forEach(item => {
       if (item !== evt.target) {
         item.classList.remove('ribbon__item_active');
@@ -88,7 +87,6 @@ export default class RibbonMenu {
     evt.target.classList.add('ribbon__item_active');
 
     let activeItemId = evt.target.dataset.id;
-    console.log(activeItemId)
     let customEvent = new CustomEvent('ribbon-select', {
       detail: activeItemId,
       bubbles: true,

@@ -11,11 +11,9 @@ export default class Modal {
   }
 
   _createModalMarkup() {
-    return `<div class="container">
+    return `
       <div class="modal">
-
       <div class="modal__overlay"></div>
-
       <div class="modal__inner">
         <div class="modal__header">
           <!--Кнопка закрытия модального окна-->
@@ -32,7 +30,6 @@ export default class Modal {
           A сюда нужно добавлять содержимое тела модального окна
         </div>
       </div>
-    </div>
   </div>`;
   }
 
